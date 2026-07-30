@@ -19,9 +19,9 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         with:
           directory: k8s/
-          soft_fail: true # Set to true so our pipeline doesn't crash while we are learning
+          soft_fail: true
 
-  # Job 2: Scan Container & Application Code
+  # Job 2: Scan Container Configuration & Dockerfile
   container-security-scan:
     name: Trivy Vulnerability Scan
     runs-on: ubuntu-latest
@@ -29,11 +29,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Run Trivy Vulnerability Scanner on /app
+      - name: Run Trivy Scanner on /app Dockerfile
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
+          scan-type: 'config' # Changed from 'fs' to 'config' to scan Dockerfiles & IaC
           scan-ref: 'app/'
           format: 'table'
-          exit-code: '0' # Set to 0 so it prints results without blocking the build
+          exit-code: '0'
           severity: 'HIGH,CRITICAL'
