@@ -1,0 +1,39 @@
+name: DevSecOps Shift-Left Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Job 1: Scan Infrastructure as Code (Kubernetes YAMLs)
+  iac-security-scan:
+    name: Checkov IaC Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov against /k8s directory
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: k8s/
+          soft_fail: true # Set to true so our pipeline doesn't crash while we are learning
+
+  # Job 2: Scan Container & Application Code
+  container-security-scan:
+    name: Trivy Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Vulnerability Scanner on /app
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: 'app/'
+          format: 'table'
+          exit-code: '0' # Set to 0 so it prints results without blocking the build
+          severity: 'HIGH,CRITICAL'
