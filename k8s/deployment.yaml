@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: honeypot-deployment
+  labels:
+    app: honeypot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: honeypot
+  template:
+    metadata:
+      labels:
+        app: honeypot
+    spec:
+      containers:
+      - name: honeypot
+        image: nginx:1.14-alpine
+        ports:
+        - containerPort: 80
+        # Intentionally missing resource limits & securityContext for Checkov to catch
